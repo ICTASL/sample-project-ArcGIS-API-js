@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1, maximum-scale=1,user-scalable=no"
+    />
+    <title>Expand widget | Sample | ArcGIS API for JavaScript 4.20</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.20/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.20/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      
+      
+    </style>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+		"esri/widgets/Search",
+		"esri/tasks/Locator",
+		"esri/layers/FeatureLayer",
+      ], function (Map, MapView, Search, Locator, FeatureLayer,) {
+        var map = new Map({
+          basemap: "osm"
+        });
+
+        const view = new MapView({
+          container: "viewDiv",//HTML Div ID for MAP area
+          map: map,
+          zoom: 7, //default zoom level
+          center: [80,7.5] //default center point longitude and latitude
+        });
+		
+		const MOHLayer = new FeatureLayer({
+          url: "https://gisapps.nsdi.gov.lk/server/rest/services/SLNSDI/Health/MapServer/2",
+		  outFields: ["*"]
+        });
+
+        map.add(MOHLayer);
+
+        var searchWidget = new Search({
+		sources: [{
+		  locator: new Locator({ url: "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer"}),
+		  countryCode:"LKA",
+		  singleLineFieldName: "SingleLine",
+		  name: "Sri Lanka Geocoding Service",
+		  localSearchOptions: {
+			minScale: 300000,
+			distance: 50000
+		  },
+		  placeholder: "Search Sri Lanka",
+		  maxResults: 3,
+		  maxSuggestions: 6,
+		  suggestionsEnabled: true,
+		  minSuggestCharacters: 0
+	  },
+	  {
+              layer: MOHLayer,
+              searchFields: ["name"],
+              displayField: "name",
+              exactMatch: false,
+              outFields: ["*"],
+              name: "MOH Area",
+              placeholder: "example: Gothatuwa"
+            }
+			],
+        view: view,
+		popupEnabled: false,
+		includeDefaultSources: false
+      });
+
+ 
+		view.ui.add(searchWidget, {
+          position: "top-right"
+        });
+
+    });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>

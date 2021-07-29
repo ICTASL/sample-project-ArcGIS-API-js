@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>
+      Intro to FeatureLayer | Sample | ArcGIS API for JavaScript 4.20
+    </title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.20/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.20/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <script>
+      require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer"], (
+        Map,
+        MapView,
+        FeatureLayer
+      ) => {
+        const map = new Map({
+          basemap: "osm"//Default Base Map (hybrid,osm,topo,streets,gray,oceans,etc..)
+        });
+
+        
+        const view = new MapView({
+          container: "viewDiv",//HTML Div ID for MAP area
+          map: map,
+          zoom: 7, //default zoom level
+          center: [80,7.5] //default center point longitude and latitude
+        });
+
+/*************************************************************
+         * The PopupTemplate content is the text that appears inside the
+         * popup. {fieldName} can be used to reference the value of an
+         * attribute of the selected feature. HTML elements can be used
+         * to provide structure and styles within the content. The
+         * fieldInfos property is an array of objects (each object representing
+         * a field) that is use to format number fields and customize field
+         * aliases in the popup and legend.
+         **************************************************************/
+
+        const template = {
+          // autocasts as new PopupTemplate()
+          title: "{name}",
+          content:           
+			"Parent Name : {parentname}"
+          
+        };
+		
+        /********************
+         * Add one or more feature layer as below
+         ********************/
+
+        // MOH Feature Layer published on NSDI server.
+        const MOHLayer = new FeatureLayer({
+          url: "https://gisapps.nsdi.gov.lk/server/rest/services/SLNSDI/Health/MapServer/2",
+		  outFields: ["*"],
+		  popupTemplate: template
+        });
+
+        map.add(MOHLayer);
+		
+		
+		
+		
+      });
+    </script>
+  </head>
+
+  <body>
+    <!--Map Area in viewDiv-->
+    <div id="viewDiv"></div>
+  </body>
+</html>

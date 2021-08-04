@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1, maximum-scale=1,user-scalable=no"
+    />
+    <title>Expand widget | Sample | ArcGIS API for JavaScript 4.20</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.20/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.20/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      
+      
+    </style>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+		"esri/widgets/Search",
+		"esri/tasks/Locator",
+		"esri/layers/FeatureLayer",
+        "esri/widgets/Expand",
+        "esri/widgets/BasemapGallery",
+        "esri/widgets/Locate",
+        "esri/widgets/Print",
+      ], function (Map, MapView, Search, Locator, FeatureLayer, Expand, BasemapGallery,Locate,Print,) {
+        var map = new Map({
+          basemap: "osm"
+        });
+
+        const view = new MapView({
+          container: "viewDiv",//HTML Div ID for MAP area
+          map: map,
+          zoom: 7, //default zoom level
+          center: [80,7.5] //default center point longitude and latitude
+        });
+		
+		 const template = {
+          // autocasts as new PopupTemplate()
+          title: "{name}",
+          content:           
+			"Parent Name : {parentname}"
+          
+        };
+		
+		const MOHLayer = new FeatureLayer({
+          url: "https://gisapps.nsdi.gov.lk/server/rest/services/SLNSDI/Health/MapServer/2",
+		  outFields: ["*"],
+		  popupTemplate: template
+        });
+
+        map.add(MOHLayer);
+
+        var searchWidget = new Search({
+		sources: [{
+		  locator: new Locator({ url: "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer"}),
+		  countryCode:"LKA",
+		  singleLineFieldName: "SingleLine",
+		  name: "Sri Lanka Geocoding Service",
+		  localSearchOptions: {
+			minScale: 300000,
+			distance: 50000
+		  },
+		  placeholder: "Search Sri Lanka",
+		  maxResults: 3,
+		  maxSuggestions: 6,
+		  suggestionsEnabled: true,
+		  minSuggestCharacters: 0
+	  },
+	  {
+              layer: MOHLayer,
+              searchFields: ["name"],
+              displayField: "name",
+              exactMatch: false,
+              outFields: ["*"],
+              name: "MOH Area",
+              placeholder: "example: Gothatuwa"
+            }
+			],
+        view: view,
+		popupEnabled: false,
+		includeDefaultSources: false
+      });
+
+ 
+		view.ui.add(searchWidget, {
+          position: "top-right"
+        });
+		
+	  view.when(function () {
+          var print = new Print({
+            view: view,
+            // specify your own print service
+            printServiceUrl:
+              "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+          });
+
+          // Add widget to the top right corner of the view
+          view.ui.add(print, "top-right");
+        });
+        
+        
+        var locateBtn = new Locate({
+          view: view
+        });
+
+        // Add the locate widget to the top left corner of the view
+        view.ui.add(locateBtn, {
+          position: "top-left"
+        });
+        
+        
+        // Create a BasemapGallery widget instance and set
+        // its container to a div element
+
+        var basemapGallery = new BasemapGallery({
+          view: view,
+          container: document.createElement("div")
+        });
+
+        // Create an Expand instance and set the content
+        // property to the DOM node of the basemap gallery widget
+        // Use an Esri icon font to represent the content inside
+        // of the Expand widget
+
+        var bgExpand = new Expand({
+          view: view,
+          content: basemapGallery
+        });
+
+        // close the expand whenever a basemap is selected
+        basemapGallery.watch("activeBasemap", function () {
+          var mobileSize =
+            view.heightBreakpoint === "xsmall" ||
+            view.widthBreakpoint === "xsmall";
+
+          if (mobileSize) {
+            bgExpand.collapse();
+          }
+        });
+
+        // Add the expand instance to the ui
+
+        view.ui.add(bgExpand, "top-right");
+		
+		
+
+    });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>

@@ -6,7 +6,7 @@
       name="viewport"
       content="initial-scale=1, maximum-scale=1,user-scalable=no"
     />
-    <title>Expand widget | Sample | ArcGIS API for JavaScript 4.20</title>
+    <title>MOH Layer | widgets | Sample | ArcGIS API for JavaScript 4.20</title>
 
     <link
       rel="stylesheet"
@@ -31,14 +31,15 @@
       require([
         "esri/Map",
         "esri/views/MapView",
-		"esri/widgets/Search",
-		"esri/tasks/Locator",
-		"esri/layers/FeatureLayer",
+	"esri/widgets/Search",
+	"esri/tasks/Locator",
+	"esri/layers/FeatureLayer",
         "esri/widgets/Expand",
         "esri/widgets/BasemapGallery",
         "esri/widgets/Locate",
         "esri/widgets/Print",
-      ], function (Map, MapView, Search, Locator, FeatureLayer, Expand, BasemapGallery,Locate,Print,) {
+        "esri/widgets/LayerList",
+      ], function (Map, MapView, Search, Locator, FeatureLayer, Expand, BasemapGallery,Locate,Print,LayerList,) {
         var map = new Map({
           basemap: "osm"
         });
@@ -46,7 +47,7 @@
         const view = new MapView({
           container: "viewDiv",//HTML Div ID for MAP area
           map: map,
-          zoom: 7, //default zoom level
+          zoom: 8, //default zoom level
           center: [80,7.5] //default center point longitude and latitude
         });
 		
@@ -112,6 +113,15 @@
 
           // Add widget to the top right corner of the view
           view.ui.add(print, "top-right");
+		  
+		  
+		  var layerList = new LayerList({
+            view: view
+          });
+
+          // Add widget to the top right corner of the view
+          view.ui.add(layerList, "top-left");
+		  
         });
         
         
